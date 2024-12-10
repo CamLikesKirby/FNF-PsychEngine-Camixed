@@ -19,6 +19,18 @@ typedef StageFile = {
 	var camera_opponent:Array<Float>;
 	var camera_girlfriend:Array<Float>;
 	var camera_speed:Null<Float>;
+
+	@:optional var preload:Dynamic;
+	@:optional var objects:Array<Dynamic>;
+}
+
+enum abstract LoadFilters(Int) from Int from UInt to Int to UInt
+{
+	var LOW_QUALITY:Int = (1 << 0);
+	var HIGH_QUALITY:Int = (1 << 1);
+
+	var STORY_MODE:Int = (1 << 2);
+	var FREEPLAY:Int = (1 << 3);
 }
 
 class StageData {
@@ -127,4 +139,15 @@ class StageData {
 		}
 		return 'stage';
 	}
+
+	public static function validateVisibility(filters:LoadFilters)
+		{
+			if((filters & STORY_MODE) == STORY_MODE)
+				if(!PlayState.isStoryMode) return false;
+			else if((filters & FREEPLAY) == FREEPLAY)
+				if(PlayState.isStoryMode) return false;
+	
+			return ((ClientPrefs.data.lowQuality && (filters & LOW_QUALITY) == LOW_QUALITY) ||
+				(!ClientPrefs.data.lowQuality && (filters & HIGH_QUALITY) == HIGH_QUALITY));
+		}
 }

@@ -195,6 +195,8 @@ class FreeplayState extends MusicBeatState
 	var instPlaying:Int = -1;
 	public static var vocals:FlxSound = null;
 	var holdTime:Float = 0;
+	var stopMusicPlay:Bool = false;
+
 	override function update(elapsed:Float)
 	{
 		if (FlxG.sound.music.volume < 0.7)
@@ -395,8 +397,10 @@ class FreeplayState extends MusicBeatState
 				super.update(elapsed);
 				return;
 			}
+			LoadingState.prepareToSong();
 			LoadingState.loadAndSwitchState(new PlayState());
-
+			FlxG.sound.music.stop();
+	
 			FlxG.sound.music.volume = 0;
 					
 			destroyFreeplayVocals();
@@ -563,7 +567,7 @@ class FreeplayState extends MusicBeatState
 		super.destroy();
 
 		FlxG.autoPause = ClientPrefs.data.autoPause;
-		if (!FlxG.sound.music.playing)
+		if (!FlxG.sound.music.playing && !stopMusicPlay)
 			FlxG.sound.playMusic(Paths.music('freakyMenu'));
 	}	
 }

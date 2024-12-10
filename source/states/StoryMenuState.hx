@@ -1,5 +1,6 @@
 package states;
 
+import backend.StageData;
 import backend.WeekData;
 import backend.Highscore;
 import backend.Song;
@@ -318,9 +319,14 @@ class StoryMenuState extends MusicBeatState
 				}
 				stopspamming = true;
 			}
+			var directory = StageData.forceNextDirectory;
+			LoadingState.loadNextDirectory();
+			StageData.forceNextDirectory = directory;
 
+			LoadingState.prepareToSong();
 			new FlxTimer().start(1, function(tmr:FlxTimer)
 			{
+				FlxG.sound.music.stop();
 				LoadingState.loadAndSwitchState(new PlayState(), true);
 				FreeplayState.destroyFreeplayVocals();
 			});
