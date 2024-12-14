@@ -1,5 +1,6 @@
 package states;
 
+import backend.StageData;
 import backend.WeekData;
 import backend.Mods;
 
@@ -45,6 +46,8 @@ class ModsMenuState extends MusicBeatState
 
 	var noModsSine:Float = 0;
 	var noModsTxt:FlxText;
+
+	public static var modsonPlayState:Bool = false;
 
 	var _lastControllerMode:Bool = false;
 	var startMod:String = null;
@@ -315,11 +318,14 @@ class ModsMenuState extends MusicBeatState
 			saveTxt();
 
 			FlxG.sound.play(Paths.sound('cancelMenu'));
+
+				
 			if(waitingToRestart)
 			{
 				//MusicBeatState.switchState(new TitleState());
 				TitleState.initialized = false;
 				TitleState.closedState = false;
+				modsonPlayState = false;
 				FlxG.sound.music.fadeOut(0.3);
 				if(FreeplayState.vocals != null)
 				{
@@ -327,8 +333,17 @@ class ModsMenuState extends MusicBeatState
 					FreeplayState.vocals = null;
 				}
 				FlxG.camera.fade(FlxColor.BLACK, 0.5, false, FlxG.resetGame, false);
+			} else {
+				if(modsonPlayState)
+					{
+						StageData.loadDirectory(PlayState.SONG);
+						LoadingState.loadAndSwitchState(new PlayState());
+						FlxG.sound.music.volume = 0;
+					} else {
+			 MusicBeatState.switchState(new MainMenuState());
+					}
 			}
-			else MusicBeatState.switchState(new MainMenuState());
+		
 
 			persistentUpdate = false;
 			FlxG.autoPause = ClientPrefs.data.autoPause;

@@ -88,6 +88,17 @@ class LoadingState extends MusicBeatState
 	
 	override function create()
 	{
+
+		{
+			if (checkLoaded())
+			{
+				dontUpdate = true;
+				super.create();
+				onLoad();
+				return;
+			}
+		}
+
 		var bg = new FlxSprite().loadGraphic(Paths.image('menuDesat'));
 		bg.setGraphicSize(Std.int(FlxG.width));
 		bg.color = 0xFFD16FFF;
@@ -201,7 +212,7 @@ class LoadingState extends MusicBeatState
 						}
 			
 						pessy.animation.play('run', true);
-						//#if ACHIEVEMENTS_ALLOWED Achievements.unlock('pessy_easter_egg'); #end
+						#if ACHIEVEMENTS_ALLOWED Achievements.unlock('pessy_easter_egg'); #end
 						
 						insert(members.indexOf(loadingText), pessy);
 						new FlxTimer().start(5, function(tmr:FlxTimer) canChangeState = true);
@@ -414,12 +425,12 @@ class LoadingState extends MusicBeatState
 				prepare(imgs, snds, mscs);
 			}
 
-			songsToPrepare.push('$folder/Inst');
+			songsToPrepare.push('$folder/Inst.' + Paths.SOUND_EXT);
 
 			var player1:String = song.player1;
 			var player2:String = song.player2;
 			var gfVersion:String = song.gfVersion;
-			var prefixVocals:String = song.needsVoices ? '$folder/Voices' : null;
+			var prefixVocals:String = song.needsVoices ? '$folder/Voices.' + Paths.SOUND_EXT : null;
 			if (gfVersion == null) gfVersion = 'gf';
 
 			dontPreloadDefaultVoices = false;

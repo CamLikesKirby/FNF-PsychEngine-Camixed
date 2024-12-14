@@ -15,6 +15,7 @@ import states.TitleState;
 	public var flashing:Bool = true;
 	public var autoPause:Bool = true;
 	public var antialiasing:Bool = true;
+	public var disableNoteRGBForNLS:Bool = false;
 	public var noteSkin:String = 'Default';
 	public var splashSkin:String = 'Psych';
 	public var splashAlpha:Float = 0.6;

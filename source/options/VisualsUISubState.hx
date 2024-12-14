@@ -76,6 +76,12 @@ class VisualsUISubState extends BaseOptionsMenu
 			'hideHud',
 			'bool');
 		addOption(option);
+
+		var option:Option = new Option('Auto RGB Disaber',
+		'Disables Note RGB for notes not in data/rgblist.txt.',
+		'disableNoteRGBForNLS',
+		'bool');
+	   addOption(option);
 		
 		var option:Option = new Option('Time Bar:',
 			"What should the Time Bar display?",

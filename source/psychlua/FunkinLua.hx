@@ -86,6 +86,9 @@ class FunkinLua {
 		set('luaDeprecatedWarnings', true);
 		set('inChartEditor', false);
 
+		// Older Psych Engine Compad
+		set('psychEngine063', false);
+
 		// Song/Week shit
 		set('curBpm', Conductor.bpm);
 		set('bpm', PlayState.SONG.bpm);
@@ -1634,6 +1637,14 @@ class FunkinLua {
 			PlayState.instance.addTextToDebug(text, color);
 		}
 	}
+
+	public static function psyVer(type:String) {
+    if (type == '0.6') {
+	return getBool('psychEngine063');
+	} else {
+		return false;
+	}
+    }
 
 	public static function getBool(variable:String) {
 		if(lastCalledScript == null) return false;

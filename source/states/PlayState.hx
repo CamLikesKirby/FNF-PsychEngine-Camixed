@@ -558,7 +558,7 @@ class PlayState extends MusicBeatState
 		updateScore(false);
 		uiGroup.add(scoreTxt);
 
-		botplayTxt = new FlxText(400, timeBar.y + 55, FlxG.width - 800, "BOTPLAY", 32);
+		botplayTxt = new FlxText(400, timeBar.y + 55, FlxG.width - 800, "CPU", 32);
 		botplayTxt.setFormat(Paths.font("vcr.ttf"), 32, FlxColor.WHITE, CENTER, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
 		botplayTxt.scrollFactor.set();
 		botplayTxt.borderSize = 1.25;
@@ -1131,7 +1131,7 @@ class PlayState extends MusicBeatState
 		// "\n" here prevents the text from being cut off by beat zooms
 		scoreTxt.text = '${tempScore}\n';
 
-		if (!miss && !cpuControlled)
+		if (!miss /*&& !cpuControlled*/)
 			doScoreBop();
 
 		callOnScripts('onUpdateScore', [miss]);
@@ -1759,7 +1759,7 @@ class PlayState extends MusicBeatState
 
 							if(daNote.mustPress)
 							{
-								if(cpuControlled && !daNote.blockHit && daNote.canBeHit && (daNote.isSustainNote || daNote.strumTime <= Conductor.songPosition))
+								if(/*cpuControlled &&*/ !daNote.blockHit && daNote.canBeHit && (daNote.isSustainNote || daNote.strumTime <= Conductor.songPosition))
 									goodNoteHit(daNote);
 							}
 							else if (daNote.wasGoodHit && !daNote.hitByOpponent && !daNote.ignoreNote)
@@ -2327,7 +2327,9 @@ class PlayState extends MusicBeatState
 			#if !switch
 			var percent:Float = ratingPercent;
 			if(Math.isNaN(percent)) percent = 0;
+			if(!ClientPrefs.getGameplaySetting('practice') && !ClientPrefs.getGameplaySetting('botplay')) {
 			Highscore.saveScore(SONG.song, songScore, storyDifficulty, percent);
+			}
 			#end
 			playbackRate = 1;
 
@@ -2464,7 +2466,7 @@ class PlayState extends MusicBeatState
 		if(daRating.noteSplash && !note.noteSplashData.disabled)
 			spawnNoteSplashOnNote(note);
 
-		if(!practiceMode && !cpuControlled) {
+		//if(!practiceMode && !cpuControlled) {
 			songScore += score;
 			if(!note.ratingDisabled)
 			{
@@ -2472,7 +2474,7 @@ class PlayState extends MusicBeatState
 				totalPlayed++;
 				RecalculateRating(false);
 			}
-		}
+	//	}
 
 		var uiPrefix:String = "";
 		var uiSuffix:String = '';

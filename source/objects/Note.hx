@@ -85,13 +85,15 @@ class Note extends FlxSprite
 	public static var swagWidth:Float = 160 * 0.7;
 	public static var colArray:Array<String> = ['purple', 'blue', 'green', 'red'];
 	public static var defaultNoteSkin(default, never):String = 'noteSkins/NOTE_assets';
+   
+    public static var isRGB = true;
 
 	public var noteSplashData:NoteSplashData = {
 		disabled: false,
 		texture: null,
 		antialiasing: !PlayState.isPixelStage,
 		useGlobalShader: false,
-		useRGBShader: (PlayState.SONG != null) ? !(PlayState.SONG.disableNoteRGB == true) : true,
+		useRGBShader: (PlayState.SONG != null) ? !(PlayState.SONG.disableNoteRGB == true) || !(isRGB && ClientPrefs.data.disableNoteRGBForNLS) : true,
 		r: -1,
 		g: -1,
 		b: -1,
@@ -230,10 +232,28 @@ class Note extends FlxSprite
 
 		this.noteData = noteData;
 
+		if (PlayState.SONG.arrowSkin == null || PlayState.SONG.arrowSkin == '') {
+		isRGB = true;
+		} else {
+		isRGB = (Mods.mergeAllTextsNamed('data/rgblist.txt').contains(CoolUtil.deleteCharactersAfter(PlayState.SONG.arrowSkin, '/'))) && Mods.mergeAllTextsNamed('data/rgblist.txt').contains('NOTE_assets' + getNoteSkinPostfix());
+		}
+
+		noteSplashData = {
+			disabled: false,
+			texture: null,
+			antialiasing: !PlayState.isPixelStage,
+			useGlobalShader: false,
+			useRGBShader: (PlayState.SONG != null) ? !(PlayState.SONG.disableNoteRGB == true) || !(isRGB && ClientPrefs.data.disableNoteRGBForNLS) : true,
+			r: -1,
+			g: -1,
+			b: -1,
+			a: ClientPrefs.data.splashAlpha
+		};
+
 		if(noteData > -1) {
 			texture = '';
 			rgbShader = new RGBShaderReference(this, initializeGlobalRGBShader(noteData));
-			if(PlayState.SONG != null && PlayState.SONG.disableNoteRGB) rgbShader.enabled = false;
+			if(PlayState.SONG != null && (PlayState.SONG.disableNoteRGB || !isRGB && ClientPrefs.data.disableNoteRGBForNLS)) rgbShader.enabled = false;
 
 			x += swagWidth * (noteData);
 			if(!isSustainNote && noteData < colArray.length) { //Doing this 'if' check to fix the warnings on Senpai songs

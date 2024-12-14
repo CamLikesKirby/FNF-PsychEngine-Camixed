@@ -3,6 +3,8 @@ package backend;
 import openfl.utils.Assets;
 import lime.utils.Assets as LimeAssets;
 
+using StringTools;
+
 class CoolUtil
 {
 	inline public static function quantize(f:Float, snap:Float){
@@ -155,6 +157,16 @@ class CoolUtil
 				text.borderStyle = OUTLINE_FAST;
 			default:
 				text.borderStyle = NONE;
+		}
+	}
+
+	public static function deleteCharactersAfter(input:String, target:String):String {
+		var index:Int = input.lastIndexOf(target);
+
+		if (index != -1) {
+			return input.substring(index + target.length);
+		} else {
+			return input;
 		}
 	}
 }
