@@ -2,6 +2,7 @@ package states;
 
 import backend.WeekData;
 import backend.Mods;
+import backend.StageData;
 
 import flixel.FlxBasic;
 import flixel.graphics.FlxGraphic;
@@ -48,6 +49,8 @@ class ModsMenuState extends MusicBeatState
 
 	var _lastControllerMode:Bool = false;
 	var startMod:String = null;
+	public static var onPlayState:Bool = false;
+
 	public function new(startMod:String = null)
 	{
 		this.startMod = startMod;
@@ -99,7 +102,7 @@ class ModsMenuState extends MusicBeatState
 		var buttonWidth = Std.int(bgList.width);
 		var buttonHeight = 80;
 
-		buttonReload = new MenuButton(buttonX, bgList.y + bgList.height + 20, buttonWidth, buttonHeight, Language.getPhrase('reload_button', 'RELOAD'), reload);
+		buttonReload = new MenuButton(buttonX, bgList.y + bgList.height + 20, buttonWidth, buttonHeight, Language.getPhrase('reload_button', 'RELOAD'), function() {if (!onPlayState) { reload(); } });
 		add(buttonReload);
 		
 		var myY = buttonReload.y + buttonReload.bg.height + 20;
@@ -115,6 +118,7 @@ class ModsMenuState extends MusicBeatState
 		add(buttonModFolder);*/
 
 		buttonEnableAll = new MenuButton(buttonX, myY, buttonWidth, buttonHeight, Language.getPhrase('enable_all_button', 'ENABLE ALL'), function() {
+			if (!onPlayState) {
 			buttonEnableAll.ignoreCheck = false;
 			for (mod in modsGroup.members)
 			{
@@ -128,6 +132,7 @@ class ModsMenuState extends MusicBeatState
 			}
 			updateModDisplayData();
 			checkToggleButtons();
+		}
 			FlxG.sound.play(Paths.sound('scrollMenu'), 0.6);
 		});
 		buttonEnableAll.bg.color = FlxColor.GREEN;
@@ -135,6 +140,7 @@ class ModsMenuState extends MusicBeatState
 		add(buttonEnableAll);
 
 		buttonDisableAll = new MenuButton(buttonX, myY, buttonWidth, buttonHeight, Language.getPhrase('disable_all_button', 'DISABLE ALL'), function() {
+			if (!onPlayState) {
 			buttonDisableAll.ignoreCheck = false;
 			for (mod in modsGroup.members)
 			{
@@ -148,6 +154,7 @@ class ModsMenuState extends MusicBeatState
 			}
 			updateModDisplayData();
 			checkToggleButtons();
+		}
 			FlxG.sound.play(Paths.sound('scrollMenu'), 0.6);
 		});
 		buttonDisableAll.bg.color = 0xFFFF6666;
@@ -211,19 +218,21 @@ class ModsMenuState extends MusicBeatState
 		var buttonsX = bgButtons.x + 320;
 		var buttonsY = bgButtons.y + 10;
 
-		var button = new MenuButton(buttonsX, buttonsY, 80, 80, Paths.image('modsMenuButtons'), function() moveModToPosition(0), 54, 54); //Move to the top
+		var button = new MenuButton(buttonsX, buttonsY, 80, 80, Paths.image('modsMenuButtons'), function() { if (!onPlayState) {  moveModToPosition(0); } }, 54, 54); // Move to the top
 		button.icon.animation.add('icon', [0]);
 		button.icon.animation.play('icon', true);
 		add(button);
 		buttons.push(button);
 
-		var button = new MenuButton(buttonsX + 100, buttonsY, 80, 80, Paths.image('modsMenuButtons'), function() moveModToPosition(curSelectedMod - 1), 54, 54); //Move up
+		var button = new MenuButton(buttonsX + 100, buttonsY, 80, 80, Paths.image('modsMenuButtons'), function() { if (!onPlayState) {  moveModToPosition(curSelectedMod - 1); } }, 54,
+			54); // Move up
 		button.icon.animation.add('icon', [1]);
 		button.icon.animation.play('icon', true);
 		add(button);
 		buttons.push(button);
 
-		var button = new MenuButton(buttonsX + 200, buttonsY, 80, 80, Paths.image('modsMenuButtons'), function() moveModToPosition(curSelectedMod + 1), 54, 54); //Move down
+		var button = new MenuButton(buttonsX + 200, buttonsY, 80, 80, Paths.image('modsMenuButtons'), function() { if (!onPlayState) { moveModToPosition(curSelectedMod + 1); } }, 54,
+			54); // Move down
 		button.icon.animation.add('icon', [2]);
 		button.icon.animation.play('icon', true);
 		add(button);
@@ -254,6 +263,7 @@ class ModsMenuState extends MusicBeatState
 
 		var button = new MenuButton(buttonsX + 400, buttonsY, 80, 80, Paths.image('modsMenuButtons'), function() //On/Off
 		{
+			if (!onPlayState) {
 			var curMod:ModItem = modsGroup.members[curSelectedMod];
 			var mod:String = curMod.folder;
 			if(!modsList.disabled.contains(mod)) //Enable
@@ -272,6 +282,7 @@ class ModsMenuState extends MusicBeatState
 			if(curMod.mustRestart) waitingToRestart = true;
 			updateModDisplayData();
 			checkToggleButtons();
+		}
 			FlxG.sound.play(Paths.sound('scrollMenu'), 0.6);
 		}, 54, 54);
 		button.icon.animation.add('icon', [4]);
@@ -324,8 +335,15 @@ class ModsMenuState extends MusicBeatState
 					FreeplayState.vocals = null;
 				}
 				FlxG.camera.fade(FlxColor.BLACK, 0.5, false, FlxG.resetGame, false);
+			} else {
+				if(onPlayState)
+					{
+						StageData.loadDirectory(PlayState.SONG);
+						LoadingState.loadAndSwitchState(new PlayState());
+						FlxG.sound.music.volume = 0;
+					}
+					else MusicBeatState.switchState(new MainMenuState());
 			}
-			else MusicBeatState.switchState(new MainMenuState());
 
 			persistentUpdate = false;
 			FlxG.autoPause = ClientPrefs.data.autoPause;
