@@ -1,5 +1,6 @@
 package states;
 
+import backend.StageData;
 import backend.WeekData;
 import backend.Mods;
 
@@ -48,6 +49,9 @@ class ModsMenuState extends MusicBeatState
 
 	var _lastControllerMode:Bool = false;
 	var startMod:String = null;
+
+	public static var onPlayStateMods:Bool = false;
+
 	public function new(startMod:String = null)
 	{
 		this.startMod = startMod;
@@ -148,6 +152,7 @@ class ModsMenuState extends MusicBeatState
 			}
 			updateModDisplayData();
 			checkToggleButtons();
+			if (onPlayStateMods) waitingToRestart = true;
 			FlxG.sound.play(Paths.sound('scrollMenu'), 0.6);
 		});
 		buttonDisableAll.bg.color = 0xFFFF6666;
@@ -260,6 +265,7 @@ class ModsMenuState extends MusicBeatState
 			{
 				modsList.enabled.remove(mod);
 				modsList.disabled.push(mod);
+				if (onPlayStateMods) waitingToRestart = true;
 			}
 			else //Disable
 			{
@@ -324,6 +330,12 @@ class ModsMenuState extends MusicBeatState
 					FreeplayState.vocals = null;
 				}
 				FlxG.camera.fade(FlxColor.BLACK, 0.5, false, FlxG.resetGame, false);
+			}
+	   else if (onPlayStateMods) 
+			{
+				StageData.loadDirectory(PlayState.SONG);
+				LoadingState.loadAndSwitchState(new PlayState());
+				FlxG.sound.music.volume = 0;
 			}
 			else MusicBeatState.switchState(new MainMenuState());
 

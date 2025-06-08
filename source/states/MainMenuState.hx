@@ -301,6 +301,7 @@ class MainMenuState extends MusicBeatState
 						#if MODS_ALLOWED
 						case 'mods':
 							MusicBeatState.switchState(new ModsMenuState());
+							ModsMenuState.onPlayStateMods = false;
 						#end
 
 						#if ACHIEVEMENTS_ALLOWED
