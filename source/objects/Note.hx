@@ -103,7 +103,7 @@ class Note extends FlxSprite
 		texture: null,
 		antialiasing: !PlayState.isPixelStage,
 		useGlobalShader: false,
-		useRGBShader: (PlayState.SONG != null) ? !(PlayState.SONG.disableNoteRGB == true) : true,
+		useRGBShader: (PlayState.SONG != null) ? !(PlayState.SONG.disableNoteRGB == true) : false,
 		r: -1,
 		g: -1,
 		b: -1,
@@ -236,6 +236,7 @@ class Note extends FlxSprite
 	public function new(strumTime:Float, noteData:Int, ?prevNote:Note, ?sustainNote:Bool = false, ?inEditor:Bool = false, ?createdFrom:Dynamic = null)
 	{
 		super();
+ 
 
 		animation = new PsychAnimationController(this);
 
@@ -260,8 +261,10 @@ class Note extends FlxSprite
 
 		if(noteData > -1)
 		{
+		
 			rgbShader = new RGBShaderReference(this, initializeGlobalRGBShader(noteData));
 			if(PlayState.SONG != null && PlayState.SONG.disableNoteRGB) rgbShader.enabled = false;
+		
 			texture = '';
 
 			x += swagWidth * (noteData);
@@ -326,6 +329,7 @@ class Note extends FlxSprite
 		x += offsetX;
 	}
 
+
 	public static function initializeGlobalRGBShader(noteData:Int)
 	{
 		if(globalRgbShaders[noteData] == null)
@@ -367,6 +371,16 @@ class Note extends FlxSprite
 				skin = defaultNoteSkin + postfix;
 		}
 		else rgbShader.enabled = false;
+
+		var jsonPath:String = 'images/$skin';
+		if (Paths.fileExists('$jsonPath.json', TEXT)) {
+        var config:Dynamic = haxe.Json.parse(Paths.getTextFromFile('$jsonPath.json'));
+		if (config != null)
+		{
+			if (!config.useRGBShader) rgbShader.enabled = false;
+		}
+	}
+
 
 		var animName:String = null;
 		if(animation.curAnim != null) {

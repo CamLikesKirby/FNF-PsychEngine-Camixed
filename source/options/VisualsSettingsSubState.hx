@@ -154,6 +154,12 @@ class VisualsSettingsSubState extends BaseOptionsMenu
 		addOption(option);
 		#end
 
+		var option:Option = new Option('Note Splash Stacking',
+			"If unchecked, Note Splashes won't stack, in some cases this makes the game less laggy",
+			'noteSplashStacking',
+			BOOL);
+		addOption(option);
+
 		var option:Option = new Option('Combo Stacking',
 			"If unchecked, Ratings and Combo won't stack, saving on System Memory and making them easier to read",
 			'comboStacking',

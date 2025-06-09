@@ -3139,6 +3139,7 @@ class PlayState extends MusicBeatState
 	public function spawnNoteSplash(x:Float = 0, y:Float = 0, ?data:Int = 0, ?note:Note, ?strum:StrumNote) {
 		var splash:NoteSplash = grpNoteSplashes.recycle(NoteSplash);
 		splash.babyArrow = strum;
+		if (!ClientPrefs.data.noteSplashStacking) grpNoteSplashes.clear(); // added this so the note splashes can look more like the base game
 		splash.spawnSplashNote(x, y, data, note);
 		grpNoteSplashes.add(splash);
 	}

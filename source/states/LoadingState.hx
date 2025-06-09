@@ -244,6 +244,14 @@ class LoadingState extends MusicBeatState
 		}
 		loadingText.text = Language.getPhrase('now_loading', 'Now Loading{1}', [dots]);
 
+		if(!transitioning && controls.BACK)
+			{
+				if(PlayState.isStoryMode)
+						MusicBeatState.switchState(new StoryMenuState());
+					else 
+						MusicBeatState.switchState(new FreeplayState());
+			}
+
 		if(!spawnedPessy)
 		{
 			if(!transitioning && controls.ACCEPT)

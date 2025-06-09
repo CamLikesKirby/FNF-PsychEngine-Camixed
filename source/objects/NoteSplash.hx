@@ -372,7 +372,7 @@ class NoteSplash extends FlxSprite
 		return {
 			animations: new Map(),
 			scale: 1,
-			allowRGB: true,
+			allowRGB: false,
 			allowPixel: true,
 			rgb: null
 		}
