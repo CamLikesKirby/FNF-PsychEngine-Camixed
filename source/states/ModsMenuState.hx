@@ -59,8 +59,10 @@ class ModsMenuState extends MusicBeatState
 	}
 	override function create()
 	{
+		if (!onPlayStateMods) {
 		Paths.clearStoredMemory();
 		Paths.clearUnusedMemory();
+		}
 		persistentUpdate = false;
 
 		modsList = Mods.parseList();
@@ -338,7 +340,6 @@ class ModsMenuState extends MusicBeatState
 				FlxG.sound.music.volume = 0;
 			}
 			else MusicBeatState.switchState(new MainMenuState());
-
 			persistentUpdate = false;
 			FlxG.autoPause = ClientPrefs.data.autoPause;
 			FlxG.mouse.visible = false;

@@ -4,7 +4,7 @@ import flixel.FlxG;
 import openfl.text.TextField;
 import openfl.text.TextFormat;
 import openfl.system.System;
-
+import states.MainMenuState;
 /**
 	The FPS class provides an easy-to-use monitor to display
 	the current frame rate of an OpenFL project
@@ -20,6 +20,8 @@ class FPSCounter extends TextField
 		The current memory usage (WARNING: this is NOT your total program memory usage, rather it shows the garbage collector memory)
 	**/
 	public var memoryMegas(get, never):Float;
+
+	public var memoryMegasMax(default, null):Float;
 
 	@:noCompletion private var times:Array<Float>;
 
@@ -55,14 +57,19 @@ class FPSCounter extends TextField
 			return;
 		}
 
-		currentFPS = times.length < FlxG.updateFramerate ? times.length : FlxG.updateFramerate;		
+		currentFPS = times.length < FlxG.updateFramerate ? times.length : FlxG.updateFramerate;	
+		if (memoryMegas > memoryMegasMax){
+            memoryMegasMax = memoryMegas;
+		}
 		updateText();
 		deltaTimeout = 0.0;
 	}
 
 	public dynamic function updateText():Void { // so people can override it in hscript
 		text = 'FPS: ${currentFPS}'
-		+ '\nMemory: ${flixel.util.FlxStringUtil.formatBytes(memoryMegas)}';
+		+ '\nRAM: ${flixel.util.FlxStringUtil.formatBytes(memoryMegas)} / ${flixel.util.FlxStringUtil.formatBytes(memoryMegasMax)}'
+		+ '\nPsych Engine Version: ${MainMenuState.psychEngineVersion}'
+		+ '\nCamixed Version: ${MainMenuState.camixedVersion}';
 
 		textColor = 0xFFFFFFFF;
 		if (currentFPS < FlxG.drawFramerate * 0.5)
