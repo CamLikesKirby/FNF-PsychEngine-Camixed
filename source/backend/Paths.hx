@@ -147,7 +147,7 @@ class Paths
 	static public function setCurrentLevel(name:String)
 		currentLevel = name.toLowerCase();
 
-	public static function getPath(file:String, ?type:AssetType = TEXT, ?parentfolder:String, ?modsAllowed:Bool = true):String
+	public static function getPath(file:String, ?type:AssetType = TEXT, ?parentfolder:String, ?modsAllowed:Bool = true, ?onlyMods:Bool = false):String
 	{
 		#if MODS_ALLOWED
 		if(modsAllowed)
@@ -157,7 +157,8 @@ class Paths
 
 			var modded:String = modFolders(customFile);
 			if(FileSystem.exists(modded)) return modded;
-		}
+			if (onlyMods) return ''; // nothing :)
+		}  
 		#end
 
 		if (parentfolder != null)
@@ -214,12 +215,25 @@ class Paths
 	inline static public function inst(song:String, ?modsAllowed:Bool = true):Sound
 		return returnSound('${formatToSongPath(song)}/Inst', 'songs', modsAllowed);
 
+	// Just in case
+	inline static public function instPath(song:String, ?modsAllowed:Bool = true)
+		return returnSoundPath('${formatToSongPath(song)}/Inst', 'songs', modsAllowed);
+
 	inline static public function voices(song:String, postfix:String = null, ?modsAllowed:Bool = true):Sound
 	{
 		var songKey:String = '${formatToSongPath(song)}/Voices';
 		if(postfix != null) songKey += '-' + postfix;
 		//trace('songKey test: $songKey');
 		return returnSound(songKey, 'songs', modsAllowed, false);
+	}
+
+	
+	inline static public function voicesPath(song:String, postfix:String = null, ?modsAllowed:Bool = true, ?onlyMods:Bool = false)
+	{
+		var songKey:String = '${formatToSongPath(song)}/Voices';
+		if(postfix != null) songKey += '-' + postfix;
+		//trace('songKey test: $songKey');
+		return returnSoundPath(songKey, 'songs', modsAllowed, false, onlyMods);
 	}
 
 	inline static public function soundRandom(key:String, min:Int, max:Int, ?modsAllowed:Bool = true)
@@ -444,6 +458,23 @@ class Paths
 		}
 		localTrackedAssets.push(file);
 		return currentTrackedSounds.get(file);
+	}
+
+		public static function returnSoundPath(key:String, ?path:String, ?modsAllowed:Bool = true, ?beepOnNull:Bool = true, ?onlyMods:Bool = false)
+	{
+		var file:String = getPath(Language.getFileTranslation(key) + '.$SOUND_EXT', SOUND, path, modsAllowed, onlyMods);
+
+		//trace('precaching sound: $file');
+		if(!currentTrackedSounds.exists(file))
+		{
+			if(beepOnNull)
+			{
+				trace('SOUND NOT FOUND: $key, PATH: $path');
+				FlxG.log.error('SOUND NOT FOUND: $key, PATH: $path');
+				return '';
+			}
+		}
+		return file;
 	}
 
 	#if MODS_ALLOWED

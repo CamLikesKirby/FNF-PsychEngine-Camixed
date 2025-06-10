@@ -1295,10 +1295,18 @@ class PlayState extends MusicBeatState
 		{
 			if (songData.needsVoices)
 			{
+				// this code is really bad but it gets the job done
 				var playerVocals = Paths.voices(songData.song, (boyfriend.vocalsFile == null || boyfriend.vocalsFile.length < 1) ? 'Player' : boyfriend.vocalsFile);
-				vocals.loadEmbedded(playerVocals != null ? playerVocals : Paths.voices(songData.song));
-				
+				var hadPlayerVocals = false;
+				if (FileSystem.exists(Paths.voicesPath(songData.song, null))) {
+				hadPlayerVocals = true;
+			    vocals.loadEmbedded(Paths.voices(songData.song)); 
+			    }
+				else vocals.loadEmbedded(playerVocals != null ? playerVocals : Paths.voices(songData.song));
 				var oppVocals = Paths.voices(songData.song, (dad.vocalsFile == null || dad.vocalsFile.length < 1) ? 'Opponent' : dad.vocalsFile);
+				if (hadPlayerVocals && !FileSystem.exists(Paths.voicesPath(songData.song, (boyfriend.vocalsFile == null || boyfriend.vocalsFile.length < 1) ? 'Player' : boyfriend.vocalsFile, true, true))) {
+				oppVocals = null;
+				}
 				if(oppVocals != null && oppVocals.length > 0) opponentVocals.loadEmbedded(oppVocals);
 			}
 		}
