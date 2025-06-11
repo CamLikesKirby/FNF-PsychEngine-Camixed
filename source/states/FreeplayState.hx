@@ -86,17 +86,24 @@ class FreeplayState extends MusicBeatState
 
 			for (j in 0...leWeek.songs.length)
 			{
-				leSongs.push(leWeek.songs[j][0]);
-				leChars.push(leWeek.songs[j][1]);
+			leSongs.push(leWeek.songs[j][0]);
+			leChars.push(leWeek.songs[j][1]);
 			}
 
 			WeekData.setDirectoryFromWeek(leWeek);
+
+			var addTitle:Bool = true;
 			for (song in leWeek.songs)
 			{
 				var colors:Array<Int> = song[2];
 				if(colors == null || colors.length < 3)
 				{
 					colors = [146, 113, 253];
+				}
+				if (addTitle) {
+				var titleName:String = (leWeek.weekName == '' || leWeek.weekName == null) ? leWeek.fileName : leWeek.weekName;
+				addSong(titleName, i, 'blank', FlxColor.fromRGB(colors[0], colors[1], colors[2]), true);
+				addTitle = false;
 				}
 				addSong(song[0], i, song[1], FlxColor.fromRGB(colors[0], colors[1], colors[2]));
 			}
@@ -112,8 +119,8 @@ class FreeplayState extends MusicBeatState
 		add(grpSongs);
 
 		for (i in 0...songs.length)
-		{
-			var songText:Alphabet = new Alphabet(90, 320, songs[i].songName, true);
+		{    
+			var songText:Alphabet = new Alphabet(90, 320, songs[i].songName, !songs[i].title);
 			songText.targetY = i;
 			grpSongs.add(songText);
 
@@ -198,9 +205,9 @@ class FreeplayState extends MusicBeatState
 		super.closeSubState();
 	}
 
-	public function addSong(songName:String, weekNum:Int, songCharacter:String, color:Int)
+	public function addSong(songName:String, weekNum:Int, songCharacter:String, color:Int, ?title:Bool = false)
 	{
-		songs.push(new SongMetadata(songName, weekNum, songCharacter, color));
+		songs.push(new SongMetadata(songName, weekNum, songCharacter, color, title));
 	}
 
 	function weekIsLocked(name:String):Bool
@@ -287,16 +294,31 @@ class FreeplayState extends MusicBeatState
 					changeSelection(-shiftMult * FlxG.mouse.wheel, false);
 				}
 			}
-
-			if (controls.UI_LEFT_P)
+            
+			if (controls.UI_LEFT_P && !FlxG.keys.pressed.SHIFT)
 			{
 				changeDiff(-1);
 				_updateSongLastDifficulty();
 			}
-			else if (controls.UI_RIGHT_P)
+			else if (controls.UI_RIGHT_P && !FlxG.keys.pressed.SHIFT)
 			{
 				changeDiff(1);
 				_updateSongLastDifficulty();
+			}
+
+			if (controls.UI_LEFT_P && FlxG.keys.pressed.SHIFT)
+			{
+			while(!songs[curSelected].title) {
+            changeSelection(-1, false, false);
+			}
+			changeSelection(curSelected != 0 ? -1 : 1, true);
+			}
+			else if (controls.UI_RIGHT_P && FlxG.keys.pressed.SHIFT)
+			{
+			while(!songs[curSelected].title) {
+            changeSelection(1, false, false);
+			}
+			changeSelection(curSelected != 0 ? 1 : -1, true);
 			}
 		}
 
@@ -510,7 +532,7 @@ class FreeplayState extends MusicBeatState
 		missingTextBG.visible = false;
 	}
 
-	function changeSelection(change:Int = 0, playSound:Bool = true)
+	function changeSelection(change:Int = 0, playSound:Bool = true, skipTitles:Bool = true)
 	{
 		if (player.playingMusic)
 			return;
@@ -518,6 +540,11 @@ class FreeplayState extends MusicBeatState
 		curSelected = FlxMath.wrap(curSelected + change, 0, songs.length-1);
 		_updateSongLastDifficulty();
 		if(playSound) FlxG.sound.play(Paths.sound('scrollMenu'), 0.4);
+
+		if (songs[curSelected].title && skipTitles) {
+		curSelected = FlxMath.wrap(curSelected + change, 0, songs.length-1);
+		_updateSongLastDifficulty();
+		}
 
 		var newColor:Int = songs[curSelected].color;
 		if(newColor != intendedColor)
@@ -530,8 +557,10 @@ class FreeplayState extends MusicBeatState
 		for (num => item in grpSongs.members)
 		{
 			var icon:HealthIcon = iconArray[num];
+			if (!songs[num].title) {
 			item.alpha = 0.6;
 			icon.alpha = 0.6;
+			}
 			if (item.targetY == curSelected)
 			{
 				item.alpha = 1;
@@ -613,15 +642,17 @@ class SongMetadata
 	public var week:Int = 0;
 	public var songCharacter:String = "";
 	public var color:Int = -7179779;
+	public var title:Bool = false;
 	public var folder:String = "";
 	public var lastDifficulty:String = null;
 
-	public function new(song:String, week:Int, songCharacter:String, color:Int)
+	public function new(song:String, week:Int, songCharacter:String, color:Int, ?title:Bool)
 	{
 		this.songName = song;
 		this.week = week;
 		this.songCharacter = songCharacter;
 		this.color = color;
+		this.title = title;
 		this.folder = Mods.currentModDirectory;
 		if(this.folder == null) this.folder = '';
 	}
