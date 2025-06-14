@@ -1137,7 +1137,7 @@ class PlayState extends MusicBeatState
 			return;
 
 		updateScoreText();
-		if (!miss && !cpuControlled && scoreBop)
+		if (!miss && scoreBop)
 			doScoreBop();
 
 		callOnScripts('onUpdateScore', [miss]);
@@ -2085,20 +2085,22 @@ class PlayState extends MusicBeatState
 				if(flValue2 == null || flValue2 <= 0) flValue2 = 0.6;
 
 				if(value != 0) {
-					if(dad.curCharacter.startsWith('gf')) { //Tutorial GF is actually Dad! The GF is an imposter!! ding ding ding ding ding ding ding, dindinding, end my suffering
+					if(dad.curCharacter.startsWith('gf') && ClientPrefs.data.aNS) { //Tutorial GF is actually Dad! The GF is an imposter!! ding ding ding ding ding ding ding, dindinding, end my suffering
 						dad.playAnim('cheer', true);
 						dad.specialAnim = true;
 						dad.heyTimer = flValue2;
-					} else if (gf != null) {
+					} else if (gf != null && ClientPrefs.data.aNS) {
 						gf.playAnim('cheer', true);
 						gf.specialAnim = true;
 						gf.heyTimer = flValue2;
 					}
 				}
 				if(value != 1) {
+					if (ClientPrefs.data.aNS) {
 					boyfriend.playAnim('hey', true);
 					boyfriend.specialAnim = true;
 					boyfriend.heyTimer = flValue2;
+					}
 				}
 
 			case 'Set GF Speed':
@@ -2130,7 +2132,7 @@ class PlayState extends MusicBeatState
 						}
 				}
 
-				if (char != null)
+				if (char != null && ClientPrefs.data.aNS)
 				{
 					char.playAnim(value1, true);
 					char.specialAnim = true;
@@ -2443,9 +2445,11 @@ class PlayState extends MusicBeatState
 		if(ret != LuaUtils.Function_Stop && !transitioning)
 		{
 			#if !switch
+			if (!ClientPrefs.getGameplaySetting('botplay') && !ClientPrefs.getGameplaySetting('practice')) {
 			var percent:Float = ratingPercent;
 			if(Math.isNaN(percent)) percent = 0;
 			Highscore.saveScore(Song.loadedSongName, songScore, storyDifficulty, percent);
+			}
 			#end
 			playbackRate = 1;
 
@@ -2471,7 +2475,6 @@ class PlayState extends MusicBeatState
 					canResync = false;
 					MusicBeatState.switchState(new StoryMenuState());
 
-					// if ()
 					if(!ClientPrefs.getGameplaySetting('practice') && !ClientPrefs.getGameplaySetting('botplay')) {
 						StoryMenuState.weekCompleted.set(WeekData.weeksList[storyWeek], true);
 						Highscore.saveWeekScore(WeekData.getWeekFileName(), campaignScore, storyDifficulty);
@@ -2585,16 +2588,14 @@ class PlayState extends MusicBeatState
 		if(daRating.noteSplash && !note.noteSplashData.disabled)
 			spawnNoteSplashOnNote(note);
 
-		if(!cpuControlled) {
-			songScore += score;
-			if(!note.ratingDisabled)
-			{
-				songHits++;
-				totalPlayed++;
-				RecalculateRating(false);
-			}
+		songScore += score;
+		if(!note.ratingDisabled)
+		{
+			songHits++;
+			totalPlayed++;
+			RecalculateRating(false);
 		}
-
+       if (ClientPrefs.data.rI) {
 		var uiFolder:String = "";
 		var antialias:Bool = ClientPrefs.data.antialiasing;
 		if (stageUI != "normal")
@@ -2694,6 +2695,7 @@ class PlayState extends MusicBeatState
 			startDelay: Conductor.crochet * 0.002 / playbackRate
 		});
 	}
+	}
 
 	public var strumsBlocked:Array<Bool> = [];
 	private function onKeyPress(event:KeyboardEvent):Void
@@ -2766,7 +2768,7 @@ class PlayState extends MusicBeatState
 		Conductor.songPosition = lastTime;
 
 		var spr:StrumNote = playerStrums.members[key];
-		if(strumsBlocked[key] != true && spr != null && spr.animation.curAnim.name != 'confirm')
+		if(strumsBlocked[key] != true && spr != null && spr.animation.curAnim.name != 'confirm' && ClientPrefs.data.pNA)
 		{
 			spr.playAnim('pressed');
 			spr.resetAnim = 0;
@@ -2793,7 +2795,7 @@ class PlayState extends MusicBeatState
 
 	private function keyReleased(key:Int)
 	{
-		if(cpuControlled || !startedCountdown || paused || key < 0 || key >= playerStrums.length) return;
+		if(cpuControlled || !startedCountdown || paused || key < 0 || key >= playerStrums.length || !ClientPrefs.data.pNA) return;
 
 		var ret:Dynamic = callOnScripts('onKeyReleasePre', [key]);
 		if(ret == LuaUtils.Function_Stop) return;
@@ -2963,7 +2965,7 @@ class PlayState extends MusicBeatState
 		var char:Character = boyfriend;
 		if((note != null && note.gfNote) || (SONG.notes[curSection] != null && SONG.notes[curSection].gfSection)) char = gf;
 
-		if(char != null && (note == null || !note.noMissAnimation) && char.hasMissAnimations)
+		if(char != null && (note == null || !note.noMissAnimation) && char.hasMissAnimations && ClientPrefs.data.aNS)
 		{
 			var postfix:String = '';
 			if(note != null) postfix = note.animSuffix;
@@ -2990,7 +2992,7 @@ class PlayState extends MusicBeatState
 		if (songName != 'tutorial')
 			camZooming = true;
 
-		if(note.noteType == 'Hey!' && dad.hasAnimation('hey'))
+		if(note.noteType == 'Hey!' && dad.hasAnimation('hey') && ClientPrefs.data.aNS)
 		{
 			dad.playAnim('hey', true);
 			dad.specialAnim = true;
@@ -3012,7 +3014,7 @@ class PlayState extends MusicBeatState
 					if(char.getAnimationName() == holdAnim || char.getAnimationName() == holdAnim + '-loop') canPlay = false;
 				}
 
-				if(canPlay) char.playAnim(animToPlay, true);
+				if(canPlay && ClientPrefs.data.aNS) char.playAnim(animToPlay, true);
 				char.holdTimer = 0;
 			}
 		}
@@ -3071,7 +3073,7 @@ class PlayState extends MusicBeatState
 						if(char.getAnimationName() == holdAnim || char.getAnimationName() == holdAnim + '-loop') canPlay = false;
 					}
 	
-					if(canPlay) char.playAnim(animToPlay, true);
+					if(canPlay && ClientPrefs.data.aNS) char.playAnim(animToPlay, true);
 					char.holdTimer = 0;
 
 					if(note.noteType == 'Hey!')
@@ -3086,10 +3088,10 @@ class PlayState extends MusicBeatState
 				}
 			}
 
-			if(!cpuControlled)
+			if(!cpuControlled && ClientPrefs.data.pNA)
 			{
 				var spr = playerStrums.members[note.noteData];
-				if(spr != null) spr.playAnim('confirm', true);
+				if(spr != null ) spr.playAnim('confirm', true);
 			}
 			else strumPlayAnim(false, Std.int(Math.abs(note.noteData)), Conductor.stepCrochet * 1.25 / 1000 / playbackRate);
 			vocals.volume = 1;
@@ -3112,7 +3114,7 @@ class PlayState extends MusicBeatState
 				switch(note.noteType)
 				{
 					case 'Hurt Note':
-						if(boyfriend.hasAnimation('hurt'))
+						if(boyfriend.hasAnimation('hurt') && ClientPrefs.data.aNS)
 						{
 							boyfriend.playAnim('hurt', true);
 							boyfriend.specialAnim = true;
@@ -3248,6 +3250,8 @@ class PlayState extends MusicBeatState
 
 	public function characterBopper(beat:Int):Void
 	{
+		if (!ClientPrefs.data.aNS) return;
+
 		if (gf != null && beat % Math.round(gfSpeed * gf.danceEveryNumBeats) == 0 && !gf.getAnimationName().startsWith('sing') && !gf.stunned)
 			gf.dance();
 		if (boyfriend != null && beat % boyfriend.danceEveryNumBeats == 0 && !boyfriend.getAnimationName().startsWith('sing') && !boyfriend.stunned)
@@ -3258,6 +3262,8 @@ class PlayState extends MusicBeatState
 
 	public function playerDance():Void
 	{
+		if (!ClientPrefs.data.aNS) return;
+
 		var anim:String = boyfriend.getAnimationName();
 		if(boyfriend.holdTimer > Conductor.stepCrochet * (0.0011 #if FLX_PITCH / FlxG.sound.music.pitch #end) * boyfriend.singDuration && anim.startsWith('sing') && !anim.endsWith('miss'))
 			boyfriend.dance();
@@ -3485,7 +3491,7 @@ class PlayState extends MusicBeatState
 			spr = playerStrums.members[id];
 		}
 
-		if(spr != null) {
+		if(spr != null && ClientPrefs.data.oNA) {
 			spr.playAnim('confirm', true);
 			spr.resetAnim = time;
 		}

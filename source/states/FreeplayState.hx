@@ -192,8 +192,11 @@ class FreeplayState extends MusicBeatState
 		
 		player = new MusicPlayer(this);
 		add(player);
-		
-		changeSelection();
+
+		// to fix selecting a title when you first enter freeplay
+		while(songs[curSelected].title) {
+        changeSelection(1, false);
+		}
 		updateTexts();
 		super.create();
 	}

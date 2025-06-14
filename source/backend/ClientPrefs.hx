@@ -22,6 +22,10 @@ import states.TitleState;
 	public var shaders:Bool = true;
 	public var cacheOnGPU:Bool = #if !switch false #else true #end; // GPU Caching made by Raltyro
 	public var framerate:Int = 60;
+	public var oNA:Bool = true;
+	public var pNA:Bool = true;
+	public var rI:Bool = true;
+	public var aNS:Bool = true;
 	public var camZooms:Bool = true;
 	public var hideHud:Bool = false;
 	public var noteOffset:Int = 0;

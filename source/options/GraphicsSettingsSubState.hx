@@ -60,6 +60,30 @@ class GraphicsSettingsSubState extends BaseOptionsMenu
 		option.onChange = onChangeFramerate;
 		#end
 
+		var option:Option = new Option('Opponent Note Animations',
+		'If unchecked, disables the oppenent\'s note animations.',
+		'oNA',
+		BOOL);
+		addOption(option);
+
+		var option:Option = new Option('Player Note Animations',
+		'If unchecked, disables the player\'s note animations.',
+		'pNA',
+		BOOL);
+		addOption(option);
+
+		var option:Option = new Option('Rating Images',
+		'If unchecked, it will disable rating images.',
+		'rI',
+		BOOL);
+		addOption(option);
+
+		var option:Option = new Option('Animations',
+		'If unchecked, it will disable the player and opponent\'s animations.',
+		'aNS',
+		BOOL);
+		addOption(option);
+
 		super();
 		insert(1, boyfriend);
 	}
