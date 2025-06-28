@@ -101,7 +101,7 @@ class FreeplayState extends MusicBeatState
 					colors = [146, 113, 253];
 				}
 				if (addTitle) {
-				var titleName:String = (leWeek.weekName == '' || leWeek.weekName == null) ? leWeek.fileName : leWeek.weekName;
+				var titleName:String = (leWeek.weekName == '' || leWeek.weekName == 'Custom Week' || leWeek.weekName == null) ? leWeek.fileName : leWeek.weekName;
 				addSong(titleName, i, 'blank', FlxColor.fromRGB(colors[0], colors[1], colors[2]), true);
 				addTitle = false;
 				}
