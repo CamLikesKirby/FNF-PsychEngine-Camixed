@@ -493,8 +493,6 @@ class PlayState extends MusicBeatState
 		timeBar.screenCenter(X);
 		timeBar.alpha = 0;
 		timeBar.visible = showTime;
-		uiGroup.add(timeBar);
-		uiGroup.add(timeTxt);
 
 		noteGroup.add(strumLineNotes);
 
@@ -533,55 +531,57 @@ class PlayState extends MusicBeatState
 		healthBar.visible = !ClientPrefs.data.hideHud;
 		healthBar.alpha = ClientPrefs.data.healthBarAlpha;
 		reloadHealthBarColors();
-		uiGroup.add(healthBar);
 
 		iconP1 = new HealthIcon(boyfriend.healthIcon, true);
 		iconP1.y = healthBar.y - 75;
 		iconP1.visible = !ClientPrefs.data.hideHud;
 		iconP1.alpha = ClientPrefs.data.healthBarAlpha;
-		uiGroup.add(iconP1);
 
 		iconP2 = new HealthIcon(dad.healthIcon, false);
 		iconP2.y = healthBar.y - 75;
 		iconP2.visible = !ClientPrefs.data.hideHud;
 		iconP2.alpha = ClientPrefs.data.healthBarAlpha;
-		uiGroup.add(iconP2);
 
 		scoreTxt = new FlxText(0, healthBar.y + 40, FlxG.width, "", 20);
 		scoreTxt.setFormat(Paths.font("vcr.ttf"), 20, FlxColor.WHITE, CENTER, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
 		scoreTxt.scrollFactor.set();
 		scoreTxt.borderSize = 1.25;
 		scoreTxt.visible = !ClientPrefs.data.hideHud;
-		uiGroup.add(scoreTxt);
 
 		botplayTxt = new FlxText(400, healthBar.y - 90, FlxG.width - 800, Language.getPhrase("Botplay").toUpperCase(), 32);
 		botplayTxt.setFormat(Paths.font("vcr.ttf"), 32, FlxColor.WHITE, CENTER, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
 		botplayTxt.scrollFactor.set();
 		botplayTxt.borderSize = 1.25;
 		botplayTxt.visible = cpuControlled;
-		uiGroup.add(botplayTxt);
+
+		for (ui in [healthBar, iconP1, iconP2, scoreTxt, botplayTxt, timeBar, timeTxt])
+          uiGroup.add(ui);
+
 		if(ClientPrefs.data.downScroll)
 			botplayTxt.y = healthBar.y + 70;
 
-		uiGroup.cameras = [camHUD];
-		noteGroup.cameras = [camHUD];
-		comboGroup.cameras = [camHUD];
+		for (camHuds in [uiGroup, noteGroup, comboGroup])
+			camHuds.cameras = [camHUD];
 
 		startingSong = true;
 
-		#if LUA_ALLOWED
-		for (notetype in noteTypes)
+		for (notetype in noteTypes) {
+			#if LUA_ALLOWED
 			startLuasNamed('custom_notetypes/' + notetype + '.lua');
-		for (event in eventsPushed)
-			startLuasNamed('custom_events/' + event + '.lua');
-		#end
-
-		#if HSCRIPT_ALLOWED
-		for (notetype in noteTypes)
+			#end
+			#if HSCRIPT_ALLOWED
 			startHScriptsNamed('custom_notetypes/' + notetype + '.hx');
-		for (event in eventsPushed)
+			#end
+		}
+		for (event in eventsPushed) {
+			#if LUA_ALLOWED
+			startLuasNamed('custom_events/' + event + '.lua');
+			#end
+			#if HSCRIPT_ALLOWED
 			startHScriptsNamed('custom_events/' + event + '.hx');
-		#end
+			#end
+		}
+
 		noteTypes = null;
 		eventsPushed = null;
 
