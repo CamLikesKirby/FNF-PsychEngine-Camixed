@@ -1964,6 +1964,11 @@ class PlayState extends MusicBeatState
 		DiscordClient.resetClientID();
 		#end
 
+		if (!ClientPrefs.data.loadingTransition) {
+		FlxTransitionableState.skipNextTransIn = true;
+		FlxTransitionableState.skipNextTransOut = true;
+		}
+
 		MusicBeatState.switchState(new ChartingState());
 	}
 
@@ -1982,6 +1987,10 @@ class PlayState extends MusicBeatState
 			opponentVocals.pause();
 
 		#if DISCORD_ALLOWED DiscordClient.resetClientID(); #end
+		if (!ClientPrefs.data.loadingTransition) {
+		FlxTransitionableState.skipNextTransIn = true;
+		FlxTransitionableState.skipNextTransOut = true;
+		}
 		MusicBeatState.switchState(new CharacterEditorState(SONG.player2));
 	}
 
@@ -2473,6 +2482,10 @@ class PlayState extends MusicBeatState
 					#if DISCORD_ALLOWED DiscordClient.resetClientID(); #end
 
 					canResync = false;
+				if (!ClientPrefs.data.loadingTransition) {
+				FlxTransitionableState.skipNextTransIn = true;
+				FlxTransitionableState.skipNextTransOut = true;
+				}
 					MusicBeatState.switchState(new StoryMenuState());
 
 					if(!ClientPrefs.getGameplaySetting('practice') && !ClientPrefs.getGameplaySetting('botplay')) {
@@ -2510,6 +2523,10 @@ class PlayState extends MusicBeatState
 				#if DISCORD_ALLOWED DiscordClient.resetClientID(); #end
 
 				canResync = false;
+				if (!ClientPrefs.data.loadingTransition) {
+				FlxTransitionableState.skipNextTransIn = true;
+				FlxTransitionableState.skipNextTransOut = true;
+				}
 				MusicBeatState.switchState(new FreeplayState());
 				FlxG.sound.playMusic(Paths.music('freakyMenu'));
 				changedDifficulty = false;

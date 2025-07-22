@@ -334,6 +334,11 @@ class PauseSubState extends MusicBeatSubstate
 
 					PlayState.instance.canResync = false;
 					Mods.loadTopMod();
+					if (!ClientPrefs.data.loadingTransition) 
+					{
+						FlxTransitionableState.skipNextTransIn = true;
+						FlxTransitionableState.skipNextTransOut = true;
+					}
 					if(PlayState.isStoryMode)
 						MusicBeatState.switchState(new StoryMenuState());
 					else 
@@ -365,7 +370,7 @@ class PauseSubState extends MusicBeatSubstate
 		FlxG.sound.music.volume = 0;
 		PlayState.instance.vocals.volume = 0;
 
-		if(noTrans)
+		if(noTrans || !ClientPrefs.data.loadingTransition)
 		{
 			FlxTransitionableState.skipNextTransIn = true;
 			FlxTransitionableState.skipNextTransOut = true;

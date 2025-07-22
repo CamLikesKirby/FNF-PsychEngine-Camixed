@@ -265,6 +265,10 @@ class MainMenuState extends MusicBeatState
 				selectedSomethin = true;
 				FlxG.mouse.visible = false;
 				FlxG.sound.play(Paths.sound('cancelMenu'));
+				if (!ClientPrefs.data.loadingTransition) {
+				FlxTransitionableState.skipNextTransIn = true;
+				FlxTransitionableState.skipNextTransOut = true;
+				}
 				MusicBeatState.switchState(new TitleState());
 			}
 
@@ -293,49 +297,13 @@ class MainMenuState extends MusicBeatState
 						option = rightOption;
 						item = rightItem;
 				}
-
+              
+				if (ClientPrefs.data.loadingTransition) {
 				FlxFlicker.flicker(item, 1, 0.06, false, false, function(flick:FlxFlicker)
 				{
-					switch (option)
-					{
-						case 'story_mode':
-							MusicBeatState.switchState(new StoryMenuState());
-						case 'freeplay':
-							MusicBeatState.switchState(new FreeplayState());
-
-						#if MODS_ALLOWED
-						case 'mods':
-							MusicBeatState.switchState(new ModsMenuState());
-							ModsMenuState.onPlayStateMods = false;
-						#end
-
-						#if ACHIEVEMENTS_ALLOWED
-						case 'achievements':
-							MusicBeatState.switchState(new AchievementsMenuState());
-						#end
-
-						case 'credits':
-							MusicBeatState.switchState(new CreditsState());
-						case 'options':
-							MusicBeatState.switchState(new OptionsState());
-							OptionsState.onPlayState = false;
-							if (PlayState.SONG != null)
-							{
-								PlayState.SONG.arrowSkin = null;
-								PlayState.SONG.splashSkin = null;
-								PlayState.stageUI = 'normal';
-							}
-						case 'donate':
-							CoolUtil.browserLoad('https://ninja-muffin24.itch.io/funkin');
-							selectedSomethin = false;
-							item.visible = true;
-						default:
-							trace('Menu Item ${option} doesn\'t do anything');
-							selectedSomethin = false;
-							item.visible = true;
-					}
+					goingToAState(option, item);
 				});
-				
+			    } else goingToAState(option, item);
 				for (memb in menuItems)
 				{
 					if(memb == item)
@@ -382,5 +350,71 @@ class MainMenuState extends MusicBeatState
 		selectedItem.animation.play('selected');
 		selectedItem.centerOffsets();
 		camFollow.y = selectedItem.getGraphicMidpoint().y;
+	}
+
+	function goingToAState(option:String, item:FlxSprite = null)
+	{
+		switch (option)
+		{
+		case 'story_mode':
+				if (!ClientPrefs.data.loadingTransition) {
+				FlxTransitionableState.skipNextTransIn = true;
+				FlxTransitionableState.skipNextTransOut = true;
+				}
+							MusicBeatState.switchState(new StoryMenuState());
+		case 'freeplay':
+				if (!ClientPrefs.data.loadingTransition) {
+				FlxTransitionableState.skipNextTransIn = true;
+				FlxTransitionableState.skipNextTransOut = true;
+				}
+							MusicBeatState.switchState(new FreeplayState());
+
+		#if MODS_ALLOWED
+		case 'mods':
+				if (!ClientPrefs.data.loadingTransition) {
+				FlxTransitionableState.skipNextTransIn = true;
+				FlxTransitionableState.skipNextTransOut = true;
+				}
+							MusicBeatState.switchState(new ModsMenuState());
+							ModsMenuState.onPlayStateMods = false;
+		#end
+
+	   #if ACHIEVEMENTS_ALLOWED
+	   case 'achievements':
+			    if (!ClientPrefs.data.loadingTransition) {
+				FlxTransitionableState.skipNextTransIn = true;
+				FlxTransitionableState.skipNextTransOut = true;
+				}
+							MusicBeatState.switchState(new AchievementsMenuState());
+	   #end
+
+		case 'credits':
+			    if (!ClientPrefs.data.loadingTransition) {
+				FlxTransitionableState.skipNextTransIn = true;
+				FlxTransitionableState.skipNextTransOut = true;
+				}
+							MusicBeatState.switchState(new CreditsState());
+		case 'options':
+				if (!ClientPrefs.data.loadingTransition) {
+				FlxTransitionableState.skipNextTransIn = true;
+				FlxTransitionableState.skipNextTransOut = true;
+				}
+							MusicBeatState.switchState(new OptionsState());
+							OptionsState.onPlayState = false;
+							if (PlayState.SONG != null)
+							{
+								PlayState.SONG.arrowSkin = null;
+								PlayState.SONG.splashSkin = null;
+								PlayState.stageUI = 'normal';
+							}
+		case 'donate':
+							CoolUtil.browserLoad('https://ninja-muffin24.itch.io/funkin');
+							selectedSomethin = false;
+							item.visible = true;
+		default:
+							trace('Menu Item ${option} doesn\'t do anything');
+							selectedSomethin = false;
+							item.visible = true;
+					}
 	}
 }

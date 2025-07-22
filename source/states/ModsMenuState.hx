@@ -64,6 +64,7 @@ class ModsMenuState extends MusicBeatState
 		Paths.clearUnusedMemory();
 		}
 		persistentUpdate = false;
+		
 
 		modsList = Mods.parseList();
 		Mods.loadTopMod();
@@ -320,6 +321,10 @@ class ModsMenuState extends MusicBeatState
 			saveTxt();
 
 			FlxG.sound.play(Paths.sound('cancelMenu'));
+			if (!ClientPrefs.data.loadingTransition) {
+				FlxTransitionableState.skipNextTransIn = true;
+				FlxTransitionableState.skipNextTransOut = true;
+			}
 			if(waitingToRestart)
 			{
 				//MusicBeatState.switchState(new TitleState());
@@ -340,7 +345,7 @@ class ModsMenuState extends MusicBeatState
 				FlxG.sound.music.volume = 0;
 			}
 			else MusicBeatState.switchState(new MainMenuState());
-			persistentUpdate = false;
+			if (!onPlayStateMods) persistentUpdate = false;
 			FlxG.autoPause = ClientPrefs.data.autoPause;
 			FlxG.mouse.visible = false;
 			return;

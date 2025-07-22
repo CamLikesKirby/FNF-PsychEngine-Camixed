@@ -344,6 +344,10 @@ class FreeplayState extends MusicBeatState
 			{
 				persistentUpdate = false;
 				FlxG.sound.play(Paths.sound('cancelMenu'));
+				if (!ClientPrefs.data.loadingTransition) {
+				FlxTransitionableState.skipNextTransIn = true;
+				FlxTransitionableState.skipNextTransOut = true;
+				}
 				MusicBeatState.switchState(new MainMenuState());
 			}
 		}

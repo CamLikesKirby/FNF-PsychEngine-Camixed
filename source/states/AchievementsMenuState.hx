@@ -205,6 +205,10 @@ class AchievementsMenuState extends MusicBeatState
 
 		if (controls.BACK) {
 			FlxG.sound.play(Paths.sound('cancelMenu'));
+			if (!ClientPrefs.data.loadingTransition) {
+				FlxTransitionableState.skipNextTransIn = true;
+				FlxTransitionableState.skipNextTransOut = true;
+				}
 			MusicBeatState.switchState(new MainMenuState());
 			goingBack = true;
 		}

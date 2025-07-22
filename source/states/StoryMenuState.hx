@@ -202,6 +202,10 @@ class StoryMenuState extends MusicBeatState
 			{
 				FlxG.sound.play(Paths.sound('cancelMenu'));
 				movedBack = true;
+				if (!ClientPrefs.data.loadingTransition) {
+				FlxTransitionableState.skipNextTransIn = true;
+				FlxTransitionableState.skipNextTransOut = true;
+				}
 				MusicBeatState.switchState(new MainMenuState());
 			}
 			super.update(elapsed);
@@ -279,6 +283,10 @@ class StoryMenuState extends MusicBeatState
 		{
 			FlxG.sound.play(Paths.sound('cancelMenu'));
 			movedBack = true;
+			if (!ClientPrefs.data.loadingTransition) {
+				FlxTransitionableState.skipNextTransIn = true;
+				FlxTransitionableState.skipNextTransOut = true;
+			}
 			MusicBeatState.switchState(new MainMenuState());
 		}
 

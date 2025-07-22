@@ -166,6 +166,12 @@ class VisualsSettingsSubState extends BaseOptionsMenu
 			BOOL);
 		addOption(option);
 
+		var option:Option = new Option('Loading Transition',
+			"If unchecked, there will be no transition when loading most of the time.",
+			'loadingTransition',
+			BOOL);
+		addOption(option);
+
 		super();
 		add(notes);
 		add(splashes);

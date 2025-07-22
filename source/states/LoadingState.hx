@@ -246,6 +246,10 @@ class LoadingState extends MusicBeatState
 
 		if(!transitioning && controls.BACK)
 			{
+				if (!ClientPrefs.data.loadingTransition) {
+				FlxTransitionableState.skipNextTransIn = true;
+				FlxTransitionableState.skipNextTransOut = true;
+				}
 				if(PlayState.isStoryMode)
 						MusicBeatState.switchState(new StoryMenuState());
 					else 
@@ -331,6 +335,10 @@ class LoadingState extends MusicBeatState
 			FlxG.sound.music.stop();
 
 		FlxG.camera.visible = false;
+		if (!ClientPrefs.data.loadingTransition) {
+			FlxTransitionableState.skipNextTransIn = true;
+			FlxTransitionableState.skipNextTransOut = true;
+		}
 		MusicBeatState.switchState(target);
 		transitioning = true;
 		finishedLoading = true;
