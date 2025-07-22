@@ -3159,16 +3159,18 @@ class PlayState extends MusicBeatState
 		if(note != null) {
 			var strum:StrumNote = playerStrums.members[note.noteData];
 			if(strum != null)
-				spawnNoteSplash(strum.x, strum.y, note.noteData, note, strum);
+				spawnNoteSplash(strum.x, strum.y, note.noteData, note, strum, note.strumTime);
 		}
 	}
 
-	public function spawnNoteSplash(x:Float = 0, y:Float = 0, ?data:Int = 0, ?note:Note, ?strum:StrumNote) {
+	var lastNoteTime:Float = 123;
+	public function spawnNoteSplash(x:Float = 0, y:Float = 0, ?data:Int = 0, ?note:Note, ?strum:StrumNote, ?strumTime:Float) {
 		var splash:NoteSplash = grpNoteSplashes.recycle(NoteSplash);
 		splash.babyArrow = strum;
-		if (!ClientPrefs.data.noteSplashStacking) grpNoteSplashes.clear(); // added this so the note splashes can look more like the base game
+		if (!ClientPrefs.data.noteSplashStacking && strumTime != lastNoteTime) grpNoteSplashes.clear(); // added this so the note splashes can look more like the base game
 		splash.spawnSplashNote(x, y, data, note);
 		grpNoteSplashes.add(splash);
+		lastNoteTime = strumTime;
 	}
 
 	override function destroy() {
