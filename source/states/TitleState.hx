@@ -384,16 +384,18 @@ class TitleState extends MusicBeatState
 
 				transitioning = true;
 				// FlxG.sound.music.stop();
-
-				new FlxTimer().start(1, function(tmr:FlxTimer)
-				{
-				if (!ClientPrefs.data.loadingTransition) {
+                if (!ClientPrefs.data.loadingTransition) {
 				FlxTransitionableState.skipNextTransIn = true;
 				FlxTransitionableState.skipNextTransOut = true;
-				}
+				MusicBeatState.switchState(new MainMenuState());
+				closedState = true;
+				} else {
+				new FlxTimer().start(1, function(tmr:FlxTimer)
+				{
 				MusicBeatState.switchState(new MainMenuState());
 				closedState = true;
 				});
+		}
 				// FlxG.sound.play(Paths.music('titleShoot'), 0.7);
 			}
 			#if TITLE_SCREEN_EASTER_EGG

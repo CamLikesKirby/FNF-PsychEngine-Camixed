@@ -99,11 +99,19 @@ class MasterEditorMenu extends MusicBeatState
 
 		if (controls.BACK)
 		{
+			if (!ClientPrefs.data.loadingTransition) {
+				FlxTransitionableState.skipNextTransIn = true;
+				FlxTransitionableState.skipNextTransOut = true;
+			}
 			MusicBeatState.switchState(new MainMenuState());
 		}
 
 		if (controls.ACCEPT)
 		{
+			if (!ClientPrefs.data.loadingTransition) {
+				FlxTransitionableState.skipNextTransIn = true;
+				FlxTransitionableState.skipNextTransOut = true;
+			}
 			switch(options[curSelected]) {
 				case 'Chart Editor'://felt it would be cool maybe
 					LoadingState.loadAndSwitchState(new ChartingState(), false);

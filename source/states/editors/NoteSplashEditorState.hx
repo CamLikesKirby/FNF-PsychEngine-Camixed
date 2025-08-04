@@ -590,6 +590,10 @@ class NoteSplashEditorState extends MusicBeatState
 
         if (!blockInput)
         {
+            if (!ClientPrefs.data.loadingTransition) {
+				FlxTransitionableState.skipNextTransIn = true;
+				FlxTransitionableState.skipNextTransOut = true;
+			}
             if (controls.BACK)
                 MusicBeatState.switchState(new MasterEditorMenu());
             if (FlxG.keys.justPressed.F1)

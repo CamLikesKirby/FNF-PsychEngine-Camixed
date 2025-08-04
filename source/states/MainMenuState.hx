@@ -313,6 +313,10 @@ class MainMenuState extends MusicBeatState
 				}
 			}
 			#if desktop
+			if (!ClientPrefs.data.loadingTransition) {
+				FlxTransitionableState.skipNextTransIn = true;
+				FlxTransitionableState.skipNextTransOut = true;
+			}
 			if (controls.justPressed('debug_1'))
 			{
 				selectedSomethin = true;

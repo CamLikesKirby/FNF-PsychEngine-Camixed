@@ -1349,6 +1349,10 @@ class StageEditorState extends MusicBeatState implements PsychUIEventHandler.Psy
 
 		if(FlxG.keys.justPressed.ESCAPE)
 		{
+			if (!ClientPrefs.data.loadingTransition) {
+				FlxTransitionableState.skipNextTransIn = true;
+				FlxTransitionableState.skipNextTransOut = true;
+				}
 			if(!unsavedProgress)
 			{
 				MusicBeatState.switchState(new states.editors.MasterEditorMenu());

@@ -400,6 +400,10 @@ class WeekEditorState extends MusicBeatState implements PsychUIEventHandler.Psyc
 			ClientPrefs.toggleVolumeKeys(true);
 			if(FlxG.keys.justPressed.ESCAPE)
 			{
+				if (!ClientPrefs.data.loadingTransition) {
+				FlxTransitionableState.skipNextTransIn = true;
+				FlxTransitionableState.skipNextTransOut = true;
+				}
 				if(!unsavedProgress)
 				{
 					MusicBeatState.switchState(new MasterEditorMenu());

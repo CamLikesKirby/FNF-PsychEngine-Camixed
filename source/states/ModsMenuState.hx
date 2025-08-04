@@ -67,7 +67,7 @@ class ModsMenuState extends MusicBeatState
 		
 
 		modsList = Mods.parseList();
-		Mods.loadTopMod();
+		if (!onPlayStateMods) Mods.loadTopMod(); // so it was you
 
 		#if DISCORD_ALLOWED
 		// Updating Discord Rich Presence
@@ -106,7 +106,7 @@ class ModsMenuState extends MusicBeatState
 		var buttonWidth = Std.int(bgList.width);
 		var buttonHeight = 80;
 
-		buttonReload = new MenuButton(buttonX, bgList.y + bgList.height + 20, buttonWidth, buttonHeight, Language.getPhrase('reload_button', 'RELOAD'), reload);
+		buttonReload = new MenuButton(buttonX, bgList.y + bgList.height + 20, buttonWidth, buttonHeight, Language.getPhrase('reload_button', 'RELOAD'),function() { if (!onPlayStateMods) reload(); });
 		add(buttonReload);
 		
 		var myY = buttonReload.y + buttonReload.bg.height + 20;
@@ -121,7 +121,9 @@ class ModsMenuState extends MusicBeatState
 		});
 		add(buttonModFolder);*/
 
+		// it looks like for some reason only clicking on the these buttons active both of them at the same time. I don't know this happend
 		buttonEnableAll = new MenuButton(buttonX, myY, buttonWidth, buttonHeight, Language.getPhrase('enable_all_button', 'ENABLE ALL'), function() {
+			if (onPlayStateMods) return;
 			buttonEnableAll.ignoreCheck = false;
 			for (mod in modsGroup.members)
 			{
@@ -142,6 +144,7 @@ class ModsMenuState extends MusicBeatState
 		add(buttonEnableAll);
 
 		buttonDisableAll = new MenuButton(buttonX, myY, buttonWidth, buttonHeight, Language.getPhrase('disable_all_button', 'DISABLE ALL'), function() {
+		if (onPlayStateMods) return;
 			buttonDisableAll.ignoreCheck = false;
 			for (mod in modsGroup.members)
 			{
@@ -155,7 +158,6 @@ class ModsMenuState extends MusicBeatState
 			}
 			updateModDisplayData();
 			checkToggleButtons();
-			if (onPlayStateMods) waitingToRestart = true;
 			FlxG.sound.play(Paths.sound('scrollMenu'), 0.6);
 		});
 		buttonDisableAll.bg.color = 0xFFFF6666;
@@ -219,19 +221,19 @@ class ModsMenuState extends MusicBeatState
 		var buttonsX = bgButtons.x + 320;
 		var buttonsY = bgButtons.y + 10;
 
-		var button = new MenuButton(buttonsX, buttonsY, 80, 80, Paths.image('modsMenuButtons'), function() moveModToPosition(0), 54, 54); //Move to the top
+		var button = new MenuButton(buttonsX, buttonsY, 80, 80, Paths.image('modsMenuButtons'), function() { if (onPlayStateMods) return; moveModToPosition(0); }, 54, 54); //Move to the top
 		button.icon.animation.add('icon', [0]);
 		button.icon.animation.play('icon', true);
 		add(button);
 		buttons.push(button);
 		
-		var button = new MenuButton(buttonsX + 100, buttonsY, 80, 80, Paths.image('modsMenuButtons'), function() moveModToPosition(curSelectedMod - 1), 54, 54); //Move up
+		var button = new MenuButton(buttonsX + 100, buttonsY, 80, 80, Paths.image('modsMenuButtons'), function() { if (onPlayStateMods) return; moveModToPosition(curSelectedMod - 1); }, 54, 54); //Move up
 		button.icon.animation.add('icon', [1]);
 		button.icon.animation.play('icon', true);
 		add(button);
 		buttons.push(button);
 		
-		var button = new MenuButton(buttonsX + 200, buttonsY, 80, 80, Paths.image('modsMenuButtons'), function() moveModToPosition(curSelectedMod + 1), 54, 54); //Move down
+		var button = new MenuButton(buttonsX + 200, buttonsY, 80, 80, Paths.image('modsMenuButtons'), function() { if (onPlayStateMods) return; moveModToPosition(curSelectedMod + 1); }, 54, 54); //Move down
 		button.icon.animation.add('icon', [2]);
 		button.icon.animation.play('icon', true);
 		add(button);
@@ -262,13 +264,15 @@ class ModsMenuState extends MusicBeatState
 
 		var button = new MenuButton(buttonsX + 400, buttonsY, 80, 80, Paths.image('modsMenuButtons'), function() //On/Off
 		{
+			if (onPlayStateMods) return;
 			var curMod:ModItem = modsGroup.members[curSelectedMod];
 			var mod:String = curMod.folder;
+		//	var pack = Mods.getPack(mod);
 			if(!modsList.disabled.contains(mod)) //Enable
 			{
 				modsList.enabled.remove(mod);
 				modsList.disabled.push(mod);
-				if (onPlayStateMods) waitingToRestart = true;
+				//if (onPlayStateMods && (pack != null && !pack.runsGlobally)) waitingToRestart = true;
 			}
 			else //Disable
 			{
@@ -287,10 +291,11 @@ class ModsMenuState extends MusicBeatState
 		button.icon.animation.play('icon', true);
 		add(button);
 		buttons.push(button);
-		button.focusChangeCallback = function(focus:Bool) {
+		if (!onPlayStateMods) button.focusChangeCallback = function(focus:Bool) {
 			if(!focus)
 				button.bg.color = modsList.enabled.contains(modsGroup.members[curSelectedMod].folder) ? FlxColor.GREEN : 0xFFFF6666;
 		};
+		else button.bg.color = FlxColor.GRAY;
 
 		if(modsList.all.length < 1)
 		{
@@ -318,7 +323,7 @@ class ModsMenuState extends MusicBeatState
 	{
 		if(controls.BACK && hoveringOnMods)
 		{
-			saveTxt();
+			saveTxt(); 
 
 			FlxG.sound.play(Paths.sound('cancelMenu'));
 			if (!ClientPrefs.data.loadingTransition) {
@@ -354,7 +359,7 @@ class ModsMenuState extends MusicBeatState
 		if(Math.abs(FlxG.mouse.deltaX) > 10 || Math.abs(FlxG.mouse.deltaY) > 10)
 		{
 			controls.controllerMode = false;
-			if(!FlxG.mouse.visible) FlxG.mouse.visible = true;
+			if(!FlxG.mouse.visible && !onPlayStateMods) FlxG.mouse.visible = true;
 		}
 		
 		if(controls.controllerMode != _lastControllerMode)
@@ -807,7 +812,7 @@ class ModsMenuState extends MusicBeatState
 		var path:String = 'modsList.txt';
 		File.saveContent(path, fileStr);
 		Mods.parseList();
-		Mods.loadTopMod();
+		if (!onPlayStateMods) Mods.loadTopMod(); // you too
 	}
 }
 
