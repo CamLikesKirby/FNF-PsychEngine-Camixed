@@ -267,12 +267,10 @@ class ModsMenuState extends MusicBeatState
 			if (onPlayStateMods) return;
 			var curMod:ModItem = modsGroup.members[curSelectedMod];
 			var mod:String = curMod.folder;
-		//	var pack = Mods.getPack(mod);
 			if(!modsList.disabled.contains(mod)) //Enable
 			{
 				modsList.enabled.remove(mod);
 				modsList.disabled.push(mod);
-				//if (onPlayStateMods && (pack != null && !pack.runsGlobally)) waitingToRestart = true;
 			}
 			else //Disable
 			{
