@@ -88,6 +88,9 @@ class FunkinLua {
 		set('versionCamixed', MainMenuState.camixedVersion.trim());
 		set('modFolder', this.modFolder);
 
+		// Older Psych Engine Compatibility
+		set('psychEngine063', false);
+
 		// Song/Week shit
 		set('curBpm', Conductor.bpm);
 		set('bpm', PlayState.SONG.bpm);
@@ -1752,6 +1755,15 @@ class FunkinLua {
 		}
 		return (result == 'true');
 	}
+	
+    public static function psyVer(type:String) {
+    if (type == '0.6') {
+	return getBool('psychEngine063');
+	} else {
+		return false;
+	}
+    }
+
 
 	function findScript(scriptFile:String, ext:String = '.lua')
 	{

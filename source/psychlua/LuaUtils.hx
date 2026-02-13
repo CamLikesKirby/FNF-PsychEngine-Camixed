@@ -27,6 +27,24 @@ class LuaUtils
 	public static final Function_StopHScript:String = "##PSYCHLUA_FUNCTIONSTOPHSCRIPT";
 	public static final Function_StopAll:String = "##PSYCHLUA_FUNCTIONSTOPALL";
 
+	public static var outdatedStates:Array<String> = [
+		'ClientPrefs', 
+		'Conductor',
+		'CoolUtil', 
+		'GameOverSubstate',
+		'Note', 
+		'NoteSplash',
+	];
+
+	public static var updatedStates:Array<String> = [
+	    'backend.ClientPrefs', 
+		'backend.Conductor',
+		'backend.CoolUtil', 
+	    'substates.GameOverSubstate',
+	    'objects.Note', 
+        'objects.NoteSplash', 
+	];
+
 	public static function getLuaTween(options:Dynamic)
 	{
 		return (options != null) ? {

@@ -17,22 +17,54 @@ class ReflectionFunctions
 	{
 		var lua:State = funk.lua;
 		Lua_helper.add_callback(lua, "getProperty", function(variable:String, ?allowMaps:Bool = false) {
-			var split:Array<String> = variable.split('.');
+			var littleVar:String = variable;
+
+			if (FunkinLua.psyVer('0.6')) {
+				for (i in 0...LuaUtils.outdatedStates.length) {
+					var item = LuaUtils.outdatedStates[i];
+					if (item == littleVar) {
+						littleVar = LuaUtils.updatedStates[i];
+					}
+				}
+			}
+			var split:Array<String> = littleVar.split('.');
 			if(split.length > 1)
 				return LuaUtils.getVarInArray(LuaUtils.getPropertyLoop(split, true, allowMaps), split[split.length-1], allowMaps);
-			return LuaUtils.getVarInArray(LuaUtils.getTargetInstance(), variable, allowMaps);
+			return LuaUtils.getVarInArray(LuaUtils.getTargetInstance(), littleVar, allowMaps);
 		});
-		Lua_helper.add_callback(lua, "setProperty", function(variable:String, value:Dynamic, ?allowMaps:Bool = false, ?allowInstances:Bool = false) {
-			var split:Array<String> = variable.split('.');
-			if(split.length > 1) {
-				LuaUtils.setVarInArray(LuaUtils.getPropertyLoop(split, true, allowMaps), split[split.length-1], allowInstances ? parseInstances(value) : value, allowMaps);
-				return value;
+		Lua_helper.add_callback(lua, "setProperty", function(variable:String, value:Dynamic, allowMaps:Bool = false) {
+			var littleVar:String = variable;
+
+			if (FunkinLua.psyVer('0.6')) {
+				for (i in 0...LuaUtils.outdatedStates.length) {
+					var item = LuaUtils.outdatedStates[i];
+					if (item == littleVar) {
+						littleVar = LuaUtils.updatedStates[i];
+					}
+				}
 			}
-			LuaUtils.setVarInArray(LuaUtils.getTargetInstance(), variable, allowInstances ? parseInstances(value) : value, allowMaps);
-			return value;
+
+			var split:Array<String> = littleVar.split('.');
+			if(split.length > 1) {
+				LuaUtils.setVarInArray(LuaUtils.getPropertyLoop(split, true, allowMaps), split[split.length-1], value, allowMaps);
+				return true;
+			}
+			LuaUtils.setVarInArray(LuaUtils.getTargetInstance(), littleVar, value, allowMaps);
+			return true;
 		});
 		Lua_helper.add_callback(lua, "getPropertyFromClass", function(classVar:String, variable:String, ?allowMaps:Bool = false) {
 			var myClass:Dynamic = Type.resolveClass(classVar);
+
+			if (FunkinLua.psyVer('0.6')) {
+				for (i in 0...LuaUtils.outdatedStates.length) {
+					var item = LuaUtils.outdatedStates[i];
+					if (item == classVar) {
+						myClass = Type.resolveClass(LuaUtils.updatedStates[i]);
+						variable = 'data.' + variable;
+					}
+			}
+		}
+			
 			if(myClass == null)
 			{
 				FunkinLua.luaTrace('getPropertyFromClass: Class $classVar not found', false, false, FlxColor.RED);
@@ -49,11 +81,22 @@ class ReflectionFunctions
 			}
 			return LuaUtils.getVarInArray(myClass, variable, allowMaps);
 		});
-		Lua_helper.add_callback(lua, "setPropertyFromClass", function(classVar:String, variable:String, value:Dynamic, ?allowMaps:Bool = false, ?allowInstances:Bool = false) {
+        Lua_helper.add_callback(lua, "setPropertyFromClass", function(classVar:String, variable:String, value:Dynamic, ?allowMaps:Bool = false) {
 			var myClass:Dynamic = Type.resolveClass(classVar);
+
+			if (FunkinLua.psyVer('0.6')) {
+				for (i in 0...LuaUtils.outdatedStates.length) {
+					var item = LuaUtils.outdatedStates[i];
+					if (item == classVar) {
+						myClass = Type.resolveClass(LuaUtils.updatedStates[i]);
+						variable = 'data.' + variable;
+					}
+			}
+		}
+
 			if(myClass == null)
 			{
-				FunkinLua.luaTrace('setPropertyFromClass: Class $classVar not found', false, false, FlxColor.RED);
+				FunkinLua.luaTrace('getPropertyFromClass: Class $classVar not found', false, false, FlxColor.RED);
 				return null;
 			}
 
@@ -63,10 +106,10 @@ class ReflectionFunctions
 				for (i in 1...split.length-1)
 					obj = LuaUtils.getVarInArray(obj, split[i], allowMaps);
 
-				LuaUtils.setVarInArray(obj, split[split.length-1], allowInstances ? parseInstances(value) : value, allowMaps);
+				LuaUtils.setVarInArray(obj, split[split.length-1], value, allowMaps);
 				return value;
 			}
-			LuaUtils.setVarInArray(myClass, variable, allowInstances ? parseInstances(value) : value, allowMaps);
+			LuaUtils.setVarInArray(myClass, variable, value, allowMaps);
 			return value;
 		});
 		Lua_helper.add_callback(lua, "getPropertyFromGroup", function(group:String, index:Int, variable:Dynamic, ?allowMaps:Bool = false) {
