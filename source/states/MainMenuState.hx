@@ -6,14 +6,6 @@ import lime.app.Application;
 import states.editors.MasterEditorMenu;
 import options.OptionsState;
 
-#if LUA_ALLOWED
-import psychlua.*;
-#else
-import psychlua.LuaUtils;
-import psychlua.LuaStates;
-import psychlua.HScript;
-#end
-
 enum MainMenuColumn {
 	LEFT;
 	CENTER;
@@ -47,19 +39,6 @@ class MainMenuState extends MusicBeatState
 	var camFollow:FlxObject;
 
 	static var showOutdatedWarning:Bool = true;
-
-	// Lua shit
-	public static var instance:MainMenuState;
-	#if LUA_ALLOWED public var luaArray:Array<FunkinLua> = []; #end
-
-	#if HSCRIPT_ALLOWED
-	public var hscriptArray:Array<HScript> = [];
-	#end
-
-	#if (LUA_ALLOWED || HSCRIPT_ALLOWED)
-	private var luaDebugGroup:FlxTypedGroup<psychlua.DebugLuaText>;
-	#end
-
 	override function create()
 	{
 		super.create();
@@ -72,11 +51,6 @@ class MainMenuState extends MusicBeatState
 		#if DISCORD_ALLOWED
 		// Updating Discord Rich Presence
 		DiscordClient.changePresence("In the Menus", null);
-		#end
-
-		#if (LUA_ALLOWED || HSCRIPT_ALLOWED)
-		luaDebugGroup = new FlxTypedGroup<psychlua.DebugLuaText>();
-		add(luaDebugGroup);
 		#end
 
 		persistentUpdate = persistentDraw = true;
@@ -135,21 +109,6 @@ class MainMenuState extends MusicBeatState
 		add(fnfVer);
 		changeItem();
 
-		// for lua
-		instance = this;
-
-		#if (LUA_ALLOWED || HSCRIPT_ALLOWED)
-		// "SCRIPTS FOLDER" SCRIPTS
-		for (folder in Mods.directoriesWithFile(Paths.getSharedPath(), 'scripts/mainmenu/'))
-			for (file in FileSystem.readDirectory(folder))
-			{
-				#if LUA_ALLOWED
-				if(file.toLowerCase().endsWith('.lua'))
-					new FunkinLua(folder + file, 'mainmenu');
-				#end
-			}
-		#end
-
 		#if ACHIEVEMENTS_ALLOWED
 		// Unlocks "Freaky on a Friday Night" achievement if it's a Friday and between 18:00 PM and 23:59 PM
 		var leDate = Date.now();
@@ -170,8 +129,6 @@ class MainMenuState extends MusicBeatState
 		#end
 
 		FlxG.camera.follow(camFollow, null, 0.15);
-
-		callOnScripts('onCreatePost');
 	}
 
 	function createMenuItem(name:String, x:Float, y:Float):FlxSprite
@@ -397,95 +354,6 @@ class MainMenuState extends MusicBeatState
 		selectedItem.animation.play('selected');
 		selectedItem.centerOffsets();
 		camFollow.y = selectedItem.getGraphicMidpoint().y;
-	}
-
-	//TODO: make these functions global
-	public function callOnLuas(funcToCall:String, args:Array<Dynamic> = null, ignoreStops = false, exclusions:Array<String> = null, excludeValues:Array<Dynamic> = null):Dynamic {
-		var returnVal:Dynamic = LuaUtils.Function_Continue;
-		#if LUA_ALLOWED
-		if(args == null) args = [];
-		if(exclusions == null) exclusions = [];
-		if(excludeValues == null) excludeValues = [LuaUtils.Function_Continue];
-
-		var arr:Array<FunkinLua> = [];
-		for (script in luaArray)
-		{
-			if(script.closed)
-			{
-				arr.push(script);
-				continue;
-			}
-
-			if(exclusions.contains(script.scriptName))
-				continue;
-
-			var myValue:Dynamic = script.call(funcToCall, args);
-			if((myValue == LuaUtils.Function_StopLua || myValue == LuaUtils.Function_StopAll) && !excludeValues.contains(myValue) && !ignoreStops)
-			{
-				returnVal = myValue;
-				break;
-			}
-
-			if(myValue != null && !excludeValues.contains(myValue))
-				returnVal = myValue;
-
-			if(script.closed) arr.push(script);
-		}
-
-		if(arr.length > 0)
-			for (script in arr)
-				luaArray.remove(script);
-		#end
-		return returnVal;
-	}
-
-	public function callOnHScript(funcToCall:String, args:Array<Dynamic> = null, ?ignoreStops:Bool = false, exclusions:Array<String> = null, excludeValues:Array<Dynamic> = null):Dynamic {
-		var returnVal:Dynamic = LuaUtils.Function_Continue;
-
-		#if HSCRIPT_ALLOWED
-		if(exclusions == null) exclusions = new Array();
-		if(excludeValues == null) excludeValues = new Array();
-		excludeValues.push(LuaUtils.Function_Continue);
-
-		var len:Int = hscriptArray.length;
-		if (len < 1)
-			return returnVal;
-
-		for(script in hscriptArray)
-		{
-			@:privateAccess
-			if(script == null || !script.exists(funcToCall) || exclusions.contains(script.origin))
-				continue;
-
-			var callValue = script.call(funcToCall, args);
-			if(callValue != null)
-			{
-				var myValue:Dynamic = callValue.returnValue;
-
-				if((myValue == LuaUtils.Function_StopHScript || myValue == LuaUtils.Function_StopAll) && !excludeValues.contains(myValue) && !ignoreStops)
-				{
-					returnVal = myValue;
-					break;
-				}
-
-				if(myValue != null && !excludeValues.contains(myValue))
-					returnVal = myValue;
-			}
-		}
-		#end
-
-		return returnVal;
-	}
-
-	public function callOnScripts(funcToCall:String, args:Array<Dynamic> = null, ignoreStops = false, exclusions:Array<String> = null, excludeValues:Array<Dynamic> = null):Dynamic {
-		var returnVal:Dynamic = LuaUtils.Function_Continue;
-		if(args == null) args = [];
-		if(exclusions == null) exclusions = [];
-		if(excludeValues == null) excludeValues = [LuaUtils.Function_Continue];
-
-		var result:Dynamic = callOnLuas(funcToCall, args, ignoreStops, exclusions, excludeValues);
-		if(result == null || excludeValues.contains(result)) result = callOnHScript(funcToCall, args, ignoreStops, exclusions, excludeValues);
-		return result;
 	}
 
 	function goingToAState(option:String, item:FlxSprite = null)
