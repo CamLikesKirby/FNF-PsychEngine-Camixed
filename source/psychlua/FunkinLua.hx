@@ -83,8 +83,8 @@ class FunkinLua {
 		set('Function_StopAll', LuaUtils.Function_StopAll);
 		set('Function_Stop', LuaUtils.Function_Stop);
 		set('Function_Continue', LuaUtils.Function_Continue);
-		set('luaDebugMode', false);
-		set('luaDeprecatedWarnings', true);
+		set('luaDebugMode', ClientPrefs.data.luaDebugModeOption);
+		set('luaDeprecatedWarnings', ClientPrefs.data.luaDeprecatedWarningsOption);
 		set('version', MainMenuState.psychEngineVersion.trim());
 		set('versionCamixed', MainMenuState.camixedVersion.trim());
 		set('modFolder', this.modFolder);

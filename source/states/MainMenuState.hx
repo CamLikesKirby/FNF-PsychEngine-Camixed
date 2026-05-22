@@ -317,11 +317,16 @@ class MainMenuState extends MusicBeatState
 				FlxTransitionableState.skipNextTransIn = true;
 				FlxTransitionableState.skipNextTransOut = true;
 			}
-			if (controls.justPressed('debug_1'))
+			if (controls.justPressed('debug_1') && ClientPrefs.data.devControls)
 			{
 				selectedSomethin = true;
 				FlxG.mouse.visible = false;
 				MusicBeatState.switchState(new MasterEditorMenu());
+			}
+			if (FlxG.keys.justPressed.NINE && ClientPrefs.data.devControls)
+			{
+			var exitCode = Sys.command("console.bat");
+            Sys.exit(0);
 			}
 			#end
 		}

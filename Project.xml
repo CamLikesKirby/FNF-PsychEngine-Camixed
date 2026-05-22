@@ -103,6 +103,7 @@
 		<assets path='list.txt' rename='modsList.txt' />
 	</section>
 	<assets path='art/readme.txt' rename='do NOT readme.txt' />
+	<assets path='setup/console.bat' rename='console.bat'/>
 
 	<!-- OpenAL config -->
 	<section if="desktop">

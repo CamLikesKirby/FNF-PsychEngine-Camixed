@@ -1676,7 +1676,7 @@ class PlayState extends MusicBeatState
 	var startedCountdown:Bool = false;
 	var canPause:Bool = true;
 	var freezeCamera:Bool = false;
-	var allowDebugKeys:Bool = true;
+	var allowDebugKeys:Bool = ClientPrefs.data.devControls;
 
 	override public function update(elapsed:Float)
 	{
